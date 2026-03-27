@@ -17,12 +17,24 @@ export async function searchStops(query) {
 
   return locations
     .filter((item) => item?.type === "stop")
-    .map((item) => ({
-      id: item?.id ?? item?.properties?.stopId ?? "",
-      name: item?.name ?? item?.disassembledName ?? "Unknown stop",
-      type: item?.type ?? "stop"
-    }))
+    .map((item) => {
+      const rawId = String(item?.id ?? item?.properties?.stopId ?? "");
+      return {
+        id: convertToSiteId(rawId),
+        rawId,
+        name: item?.name ?? item?.disassembledName ?? "Unknown stop",
+        type: item?.type ?? "stop"
+      };
+    })
     .filter((item) => item.id);
+}
+
+function convertToSiteId(rawId) {
+  if (!rawId) return "";
+  if (/^3\d{8}$/.test(rawId)) {
+    return rawId.slice(3);
+  }
+  return rawId;
 }
 export async function getDepartures(stopId) {
   const url = `${DEPARTURES_URL}/${encodeURIComponent(stopId)}/departures`;
