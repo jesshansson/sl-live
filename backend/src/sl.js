@@ -2,7 +2,7 @@ const STOP_FINDER_URL = "https://journeyplanner.integration.sl.se/v2/stop-finder
 const DEPARTURES_URL = "https://transport.integration.sl.se/v1/sites";
 
 export async function searchStops(query) {
-  const url = new URL(STOP_FINDER_URL);
+  const url = new URL("https://journeyplanner.integration.sl.se/v2/stop-finder");
   url.searchParams.set("name_sf", query);
   url.searchParams.set("any_obj_filter_sf", "2");
   url.searchParams.set("type_sf", "any");
@@ -13,15 +13,17 @@ export async function searchStops(query) {
   }
 
   const data = await response.json();
-  const stopLocations = Array.isArray(data?.stopLocations) ? data.stopLocations : [];
+  const locations = Array.isArray(data?.locations) ? data.locations : [];
 
-  return stopLocations.map((item) => ({
-    id: item?.id ?? item?.properties?.stopId ?? "",
-    name: item?.name ?? "Unknown stop",
-    type: item?.productAtStop ? "station" : "stop"
-  })).filter((item) => item.id);
+  return locations
+    .filter((item) => item?.type === "stop")
+    .map((item) => ({
+      id: item?.id ?? item?.properties?.stopId ?? "",
+      name: item?.name ?? item?.disassembledName ?? "Unknown stop",
+      type: item?.type ?? "stop"
+    }))
+    .filter((item) => item.id);
 }
-
 export async function getDepartures(stopId) {
   const url = `${DEPARTURES_URL}/${encodeURIComponent(stopId)}/departures`;
   const response = await fetch(url);
