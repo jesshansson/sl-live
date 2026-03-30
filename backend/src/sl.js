@@ -96,7 +96,7 @@ export async function getDepartures(stopId) {
     destination: item?.destination ?? item?.direction ?? "Unknown destination",
     scheduled: item?.scheduled ?? null,
     expected: item?.expected ?? item?.display ?? null,
-    countdown: getCountdown(item?.expected ?? item?.scheduled)
+    countdown: getCountdown(item?.expected, item?.scheduled)
   }));
 
   return {
@@ -131,10 +131,26 @@ function compareTimes(a, b) {
   return new Date(a || 0).getTime() - new Date(b || 0).getTime();
 }
 
-function getCountdown(timestamp) {
-  if (!timestamp) return "time unavailable";
-  const minutes = Math.round((new Date(timestamp).getTime() - Date.now()) / 60000);
+function getCountdown(expected, scheduled) {
+  const liveValue = parseSlTime(expected);
+  const scheduledValue = parseSlTime(scheduled);
+  const target = liveValue ?? scheduledValue;
+
+  if (!target) return "time unavailable";
+
+  const diffMs = target.getTime() - Date.now();
+  const minutes = Math.round(diffMs / 60000);
+
   if (minutes <= 0) return "now";
   if (minutes === 1) return "1 min";
   return `${minutes} min`;
+}
+
+function parseSlTime(value) {
+  if (!value) return null;
+
+  const parsed = new Date(value);
+  if (!Number.isNaN(parsed.getTime())) return parsed;
+
+  return null;
 }

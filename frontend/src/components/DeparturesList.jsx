@@ -57,12 +57,15 @@ export default function DeparturesList({
             <div className="destinationText">{departure.destination}</div>
 
             <div className="departureMeta">
-              <span className="modePill">{departure.type}</span>
-              {formatScheduledTime(departure.scheduled) ? (
-                <span className="muted">
-                  Scheduled {formatScheduledTime(departure.scheduled)}
-                </span>
-              ) : null}
+              <span className="modePill">
+  {departure.type === "subway" ? "Metro" : departure.type}
+</span>
+       {departure.countdown === "time unavailable" &&
+formatScheduledTime(departure.scheduled) ? (
+  <span className="muted">
+    Scheduled {formatScheduledTime(departure.scheduled)}
+  </span>
+) : null}
             </div>
           </article>
         ))}
