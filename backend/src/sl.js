@@ -1,8 +1,42 @@
 const STOP_FINDER_URL = "https://journeyplanner.integration.sl.se/v2/stop-finder";
-const DEPARTURES_URL = "https://transport.integration.sl.se/v1/sites";
+const SITES_URL = "https://transport.integration.sl.se/v1/sites";
 
 export async function searchStops(query) {
-  const url = new URL("https://journeyplanner.integration.sl.se/v2/stop-finder");
+  const [journeyStops, sites] = await Promise.all([
+    fetchJourneyPlannerStops(query),
+    fetchTransportSites()
+  ]);
+
+  const normalizedSites = sites.map((site) => ({
+    id: String(site.id),
+    name: normalizeName(site.name)
+  }));
+
+  return journeyStops
+    .map((stop) => {
+      const normalizedStopName = normalizeName(stop.name);
+
+      const exactMatch = normalizedSites.find(
+        (site) => site.name === normalizedStopName
+      );
+
+      const looseMatch = exactMatch || normalizedSites.find(
+        (site) =>
+          site.name.includes(normalizedStopName) ||
+          normalizedStopName.includes(site.name)
+      );
+
+      return {
+        id: looseMatch?.id || "",
+        name: stop.name,
+        type: "stop"
+      };
+    })
+    .filter((stop) => stop.id);
+}
+
+async function fetchJourneyPlannerStops(query) {
+  const url = new URL(STOP_FINDER_URL);
   url.searchParams.set("name_sf", query);
   url.searchParams.set("any_obj_filter_sf", "2");
   url.searchParams.set("type_sf", "any");
@@ -13,29 +47,35 @@ export async function searchStops(query) {
   }
 
   const data = await response.json();
+  console.log("DEPARTURES RESPONSE", JSON.stringify(data, null, 2));
   const locations = Array.isArray(data?.locations) ? data.locations : [];
 
   return locations
     .filter((item) => item?.type === "stop")
-    .map((item) => {
-      const rawId = String(item?.id ?? item?.properties?.stopId ?? "");
-      return {
-        id: convertToSiteId(rawId),
-        rawId,
-        name: item?.name ?? item?.disassembledName ?? "Unknown stop",
-        type: item?.type ?? "stop"
-      };
-    })
-    .filter((item) => item.id);
+    .map((item) => ({
+      name: item?.name ?? item?.disassembledName ?? "Unknown stop"
+    }));
 }
 
-function convertToSiteId(rawId) {
-  if (!rawId) return "";
-  if (/^3\d{8}$/.test(rawId)) {
-    return rawId.slice(3);
+async function fetchTransportSites() {
+  const response = await fetch(SITES_URL);
+  if (!response.ok) {
+    throw new Error(`SL sites failed with ${response.status}`);
   }
-  return rawId;
+
+  const data = await response.json();
+  return Array.isArray(data) ? data : [];
 }
+
+function normalizeName(name) {
+  return String(name || "")
+    .toLowerCase()
+    .replace(/^stockholm,\s*/i, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+
 export async function getDepartures(stopId) {
   const url = `https://transport.integration.sl.se/v1/sites/${encodeURIComponent(stopId)}/departures`;
   const response = await fetch(url);
