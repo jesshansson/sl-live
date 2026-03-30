@@ -46,29 +46,18 @@ export async function getDepartures(stopId) {
 
   const data = await response.json();
 
-  const categories = [
-    ["metro", "subway"],
-    ["bus", "bus"],
-    ["train", "train"],
-    ["tram", "tram"],
-    ["ship", "ferry"]
-  ];
+  const rawDepartures = Array.isArray(data?.departures)
+    ? data.departures
+    : flattenLegacyModeBuckets(data);
 
-  const departures = [];
-
-  for (const [key, label] of categories) {
-    const items = Array.isArray(data?.[key]) ? data[key] : [];
-    for (const item of items) {
-      departures.push({
-        type: label,
-        line: item?.designation ?? item?.line?.designation ?? item?.line?.name ?? "",
-        destination: item?.destination ?? "Unknown destination",
-        scheduled: item?.scheduled ?? null,
-        expected: item?.expected ?? item?.display ?? null,
-        countdown: getCountdown(item?.expected ?? item?.scheduled)
-      });
-    }
-  }
+  const departures = rawDepartures.map((item) => ({
+    type: mapTransportMode(item?.transport_mode),
+    line: item?.designation ?? item?.line?.designation ?? item?.line?.name ?? item?.name ?? "",
+    destination: item?.destination ?? item?.direction ?? "Unknown destination",
+    scheduled: item?.scheduled ?? null,
+    expected: item?.expected ?? item?.display ?? null,
+    countdown: getCountdown(item?.expected ?? item?.scheduled)
+  }));
 
   return {
     stop: data?.site?.name ?? String(stopId),
@@ -78,6 +67,26 @@ export async function getDepartures(stopId) {
   };
 }
 
+function flattenLegacyModeBuckets(data) {
+  const categories = ["metro", "bus", "train", "tram", "ship"];
+  return categories.flatMap((key) => Array.isArray(data?.[key]) ? data[key] : []);
+}
+
+function mapTransportMode(mode) {
+  switch (mode) {
+    case "METRO":
+      return "subway";
+    case "TRAIN":
+      return "train";
+    case "TRAM":
+      return "tram";
+    case "SHIP":
+      return "ferry";
+    case "BUS":
+    default:
+      return "bus";
+  }
+}
 function compareTimes(a, b) {
   return new Date(a || 0).getTime() - new Date(b || 0).getTime();
 }
