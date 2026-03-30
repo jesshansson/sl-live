@@ -1,7 +1,7 @@
 export default function SearchBox({ value, onChange, onSearch, isLoading }) {
   return (
     <form
-      className="search"
+      className="searchBar"
       onSubmit={(event) => {
         event.preventDefault();
         onSearch();
@@ -10,8 +10,8 @@ export default function SearchBox({ value, onChange, onSearch, isLoading }) {
       <input
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        placeholder="Search stop"
-        aria-label="Search stop"
+        placeholder="Search stop or station"
+        aria-label="Search stop or station"
       />
       <button type="submit" disabled={isLoading}>
         {isLoading ? "Searching..." : "Search"}

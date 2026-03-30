@@ -1,166 +1,310 @@
 :root {
   font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  color: #111827;
-  background: #f3f4f6;
+  color: #0f172a;
+  background: #eef2f7;
 }
 
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
 body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  background: linear-gradient(180deg, #f9fafb, #eef2ff);
+  background:
+    radial-gradient(circle at top left, rgba(255,255,255,0.95), rgba(238,242,247,0.95)),
+    linear-gradient(180deg, #f8fafc, #e8edf5);
 }
 
-button, input {
+button,
+input {
   font: inherit;
 }
 
-.appShell {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 20px;
-}
-
-.hero {
-  margin-bottom: 16px;
-}
-
-.badge {
-  display: inline-block;
-  background: #111827;
-  color: white;
-  border-radius: 999px;
-  padding: 6px 10px;
-  font-size: 12px;
-  margin-bottom: 8px;
-}
-
-h1, h2, p {
-  margin: 0 0 10px;
-}
-
-.muted {
-  color: #6b7280;
-}
-
-.search {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 10px;
-  margin: 20px 0;
-}
-
-.search input {
-  border: 1px solid #d1d5db;
-  border-radius: 14px;
-  padding: 14px 16px;
-  background: white;
-}
-
-.search button,
-.row {
-  border: 0;
-  border-radius: 14px;
-  padding: 14px 16px;
-  background: white;
+button {
   cursor: pointer;
 }
 
-.search button {
-  background: #111827;
+.appShell {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 18px;
+}
+
+.hero {
+  margin-bottom: 18px;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  background: #0f172a;
   color: white;
+  border-radius: 999px;
+  padding: 8px 12px;
+  font-size: 13px;
+  margin-bottom: 10px;
 }
 
-.grid {
-  display: grid;
-  grid-template-columns: 1fr 1.2fr;
-  gap: 16px;
+h1 {
+  margin: 0 0 8px;
+  font-size: clamp(2rem, 5vw, 3.25rem);
+  line-height: 1.05;
+  letter-spacing: -0.04em;
 }
 
-.card {
-  background: rgba(255,255,255,0.9);
-  border: 1px solid #e5e7eb;
-  border-radius: 20px;
-  padding: 16px;
-  backdrop-filter: blur(6px);
-}
-
-.list {
-  list-style: none;
-  padding: 0;
+h2 {
   margin: 0;
+  font-size: 1.25rem;
+  letter-spacing: -0.02em;
+}
+
+.subtitle {
+  margin: 0;
+  color: #475569;
+  font-size: 1.05rem;
+}
+
+.searchBar {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  margin: 18px 0 20px;
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  padding: 6px 0;
+  backdrop-filter: blur(8px);
+}
+
+.searchBar input {
+  border: 1px solid #cbd5e1;
+  border-radius: 18px;
+  padding: 16px 18px;
+  background: rgba(255,255,255,0.92);
+  font-size: 1.05rem;
+  outline: none;
+}
+
+.searchBar input:focus {
+  border-color: #0f172a;
+}
+
+.searchBar button,
+.refreshButton {
+  border: 0;
+  border-radius: 18px;
+  padding: 14px 18px;
+  background: #0f172a;
+  color: white;
+  min-width: 112px;
+}
+
+.searchBar button:disabled,
+.refreshButton:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 330px 1fr;
+  gap: 18px;
+  align-items: start;
+}
+
+.sidebar,
+.mainPanel {
+  min-width: 0;
+}
+
+.panel,
+.selectedStopCard {
+  background: rgba(255,255,255,0.92);
+  border: 1px solid #dbe3ee;
+  border-radius: 24px;
+  padding: 18px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04);
+}
+
+.panelHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.selectedStopCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.eyebrow {
+  margin: 0 0 6px;
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+.stopsList {
   display: grid;
   gap: 10px;
 }
 
-.row {
+.stopButton {
   width: 100%;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  text-align: left;
+  border: 1px solid #d8e0ea;
+  border-radius: 18px;
+  background: #f8fafc;
+  padding: 14px 16px;
+}
+
+.stopButton:hover {
+  border-color: #94a3b8;
+}
+
+.stopButton.active {
+  border-color: #0f172a;
+  background: white;
+}
+
+.stopName {
+  font-weight: 500;
+}
+
+.stopMeta,
+.muted {
+  color: #64748b;
+}
+
+.departuresPanel {
+  min-height: 380px;
+}
+
+.departuresGrid {
+  display: grid;
+  gap: 12px;
+}
+
+.departureCard {
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 16px;
+  background: linear-gradient(180deg, #ffffff, #f8fafc);
+}
+
+.departureTop {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  text-align: left;
-  border: 1px solid #e5e7eb;
+  gap: 16px;
+  margin-bottom: 10px;
 }
 
-.row.active {
-  border-color: #111827;
-}
-
-.departure {
-  display: grid;
-  grid-template-columns: 90px 1fr auto;
-  gap: 12px;
-  align-items: center;
-  padding: 12px 0;
-  border-bottom: 1px solid #f3f4f6;
-}
-
-.line {
+.modeLine {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 }
 
-.emoji {
-  width: 24px;
+.modeIcon {
+  font-size: 1.25rem;
 }
 
-.countdown {
+.lineBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  padding: 8px 10px;
+  border-radius: 999px;
+  background: #e2e8f0;
   font-weight: 700;
+}
+
+.countdownBig {
+  font-size: 1.4rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
   white-space: nowrap;
 }
 
-.error {
-  color: #b91c1c;
+.destinationText {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin-bottom: 10px;
 }
 
-.globalError {
-  margin-bottom: 12px;
-}
-
-.sectionHeader {
+.departureMeta {
   display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  align-items: baseline;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
-@media (max-width: 760px) {
-  .grid {
+.modePill {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 6px 10px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-size: 0.9rem;
+  text-transform: capitalize;
+}
+
+.errorBanner {
+  margin: 0 0 14px;
+  color: #b91c1c;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 14px;
+  padding: 12px 14px;
+}
+
+@media (max-width: 900px) {
+  .layout {
     grid-template-columns: 1fr;
   }
 
-  .search {
+  .selectedStopCard {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .refreshButton {
+    width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .appShell {
+    padding: 14px;
+  }
+
+  .searchBar {
     grid-template-columns: 1fr;
   }
 
-  .departure {
-    grid-template-columns: 78px 1fr;
+  .searchBar button {
+    width: 100%;
   }
 
-  .countdown {
-    grid-column: 2;
+  .departureTop {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .countdownBig {
+    font-size: 1.25rem;
   }
 }
