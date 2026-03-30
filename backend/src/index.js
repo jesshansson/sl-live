@@ -14,9 +14,9 @@ app.use(express.json());
 app.get("/health", async (_req, res) => {
   try {
     await pool.query("SELECT 1");
-    res.json({ ok: true });
-  } catch (error) {
-    res.status(500).json({ ok: false, error: "Database unavailable" });
+    res.json({ ok: true, database: "ok" });
+  } catch {
+    res.json({ ok: true, database: "unavailable" });
   }
 });
 

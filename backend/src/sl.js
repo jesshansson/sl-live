@@ -37,7 +37,7 @@ function convertToSiteId(rawId) {
   return rawId;
 }
 export async function getDepartures(stopId) {
-  const url = `${DEPARTURES_URL}/${encodeURIComponent(stopId)}/departures`;
+  const url = `https://transport.integration.sl.se/v1/sites/${encodeURIComponent(stopId)}/departures`;
   const response = await fetch(url);
 
   if (!response.ok) {
@@ -45,12 +45,13 @@ export async function getDepartures(stopId) {
   }
 
   const data = await response.json();
+
   const categories = [
-    ["metros", "subway"],
-    ["buses", "bus"],
-    ["trains", "train"],
-    ["trams", "tram"],
-    ["ships", "ferry"]
+    ["metro", "subway"],
+    ["bus", "bus"],
+    ["train", "train"],
+    ["tram", "tram"],
+    ["ship", "ferry"]
   ];
 
   const departures = [];
@@ -60,7 +61,7 @@ export async function getDepartures(stopId) {
     for (const item of items) {
       departures.push({
         type: label,
-        line: item?.line?.designation ?? item?.designation ?? "",
+        line: item?.designation ?? item?.line?.designation ?? item?.line?.name ?? "",
         destination: item?.destination ?? "Unknown destination",
         scheduled: item?.scheduled ?? null,
         expected: item?.expected ?? item?.display ?? null,
